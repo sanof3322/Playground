@@ -22,7 +22,7 @@ const NoteApp = (props) => {
 
   return (
     <div>
-      <h1>Notes!!!</h1>
+      <h1>Notes</h1>
       {notes.map((note, index) => {
         return(
           <div key={index}>
@@ -34,7 +34,7 @@ const NoteApp = (props) => {
       <p>Add note</p>
       <form onSubmit={addNote}>
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <button>Add notes!!!</button>
+        <button>Add notes</button>
       </form>
     </div>
   )
