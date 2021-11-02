@@ -22,7 +22,7 @@ const NoteApp = (props) => {
 
   return (
     <div>
-      <h1>Notes</h1>
+      <h1>Notes!!!</h1>
       {notes.map((note, index) => {
         return(
           <div key={index}>
