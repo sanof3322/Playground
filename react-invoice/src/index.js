@@ -23,14 +23,12 @@ const NoteApp = (props) => {
   return (
     <div>
       <h1>Notes</h1>
-      {notes.map((note, index) => {
-        return(
+      {notes.map((note, index) => (
           <div key={index}>
-            <h3>{note.Title}</h3>
-            <button onClick={() => {return removeNote(note.title)}}>x</button>
+            <h3>{note.title}</h3>
+            <button onClick={() => removeNote(note.title)}>x</button>
           </div>
-        )
-      })}
+      ))}
       <p>Add note</p>
       <form onSubmit={addNote}>
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
