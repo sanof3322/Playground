@@ -1,42 +1,34 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
-// import app from './App'
+import NoteApp from "./components/NoteApp"
 
-const NoteApp = (props) => {
-  const [notes, setNotes] = useState([])
-  const  [title, setTitle] = useState("")
 
-  const addNote = (e) => {
-    e.preventDefault()
-    setNotes([
-      ...notes,
-      {title}
-    ])
-    setTitle("")
-  }
+const App = (props) => {
+  const [count, setCount] = useState(props.count)
+  const [text, setText] = useState("")
 
-  const removeNote = (title) => {
-    setNotes(notes.filter((note) => note.title !== title))
-  }
+  useEffect(() => {
+    console.log("useEffect ran");
+    document.title = count
+  }, [count])
+
+  useEffect(() => {
+    //runs only ones once component did mount
+    console.log("runs only ones once component did mount");
+    document.title = count
+  })
 
   return (
     <div>
-      <h1>Notes</h1>
-      {notes.map((note, index) => (
-          <div key={index}>
-            <h3>{note.title}</h3>
-            <button onClick={() => removeNote(note.title)}>x</button>
-          </div>
-      ))}
-      <p>Add note</p>
-      <form onSubmit={addNote}>
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <button>Add notes</button>
-      </form>
+      <p>The current {text || 'count'} is {count}</p>
+      <button onClick={() => setCount(count - 1)}>-1</button>
+      <button onClick={() => setCount(props.count)}>Reset</button>
+      <button onClick={() => setCount(count + 1)}>1</button>
+      <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
     </div>
   )
-}
+};
 
 ReactDOM.render(
   <NoteApp />,
