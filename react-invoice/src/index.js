@@ -5,16 +5,6 @@ import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route, Routes, Outlet} from 'react-router-dom' 
 import Invoices from './components/Invoices';
 
-
-
-const Home = () => {
-  return (
-    <>
-      <h1>Home</h1>
-    </>
-  )
-}
-
 //routing tutorial https://github.com/remix-run/react-router/blob/main/docs/getting-started/tutorial.md
 const Router = (
   <BrowserRouter basename='/'>

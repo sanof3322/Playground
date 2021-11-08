@@ -1,4 +1,4 @@
-import React, {useState, useContext} from "react"
+import React, {useState} from "react"
 import { useNavigate } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import {Typeahead} from 'react-bootstrap-typeahead'
@@ -10,19 +10,25 @@ import "react-datepicker/dist/react-datepicker.css";
 const NewInvoice = () => {
   let navigate = useNavigate(); 
 
-  const blankInvoiceItem = {
-    Id: 0,
-    Name: "",
-    Price:  0,
-    Quantity: 1,
-    ItemTotal: 0
+  const uniqueId = (length=16) => {
+    return parseInt(Math.ceil(Math.random() * Date.now()).toPrecision(length).toString().replace(".", ""))
+  }
+
+  const blankInvoiceItem = () => {
+    return {
+      Id: uniqueId(8),
+      Name: "",
+      Price:  0,
+      Quantity: 1,
+      ItemTotal: 0
+    }
   }
 
   const  [invoice, setInvoice] = useState({
     InvoiceNumber: "",
     DueDate: "",
     Customer: null,
-    InvoiceItems: [blankInvoiceItem]
+    InvoiceItems: [blankInvoiceItem()]
   })
 
   return (
@@ -33,7 +39,7 @@ const NewInvoice = () => {
         </div>
         <div className="col text-end">
           <button
-            className="btn btn-primary"
+            className="btn btn-outline-primary"
             onClick={() => {
               navigate("/");
             }}>
@@ -92,6 +98,21 @@ const NewInvoice = () => {
             </div>
           </div>
 
+          <div className="row">
+            <div className="col text-end">
+              <button className="btn btn-light" onClick={() => setInvoice({
+                ...invoice,
+                InvoiceItems:[
+                  ...invoice.InvoiceItems,
+                  blankInvoiceItem()
+                ]
+              })}>
+                <i className="bi bi-plus-lg"></i>
+                Add Item
+              </button>
+            </div>
+          </div>
+
           <table className="table">
             <thead>
               <tr>
@@ -103,30 +124,35 @@ const NewInvoice = () => {
               </tr>
             </thead>
             <tbody>
-              {invoice.InvoiceItems.map((i) => (
-                <tr key={i.Id}>
-                  <td>
+              {invoice.InvoiceItems.map((i, index) => (
+                <tr key={index}>
+                  <td width="40%">
                     <div className="form-group">
                       <label htmlFor={`invoice-item-id-${i.Id}`} className="visually-hidden">Invoice Item</label>
                       <Typeahead
-                        id={`invoice-item-id-${i.Id}`}
+                        id={`invoice-item-id-${i.Id}`}                        
                         labelKey={option => `${option.Name}`}
+                        IsInvalid={true} 
                         onChange={(selected) => {
-                          //find invoice item to edit;
-                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id === i.Id)[0];
+                          const items = [...invoice.InvoiceItems];
+
+                          items.forEach(item => {
+                            if(item.Id === i.Id){
+                              if(selected.length > 0){
+                                item.Id = selected[0].Id;
+                                item.Name = selected[0].Name;
+                                item.Price = selected[0].Price;
+                              }else{
+                                item.Id = uniqueId();
+                                item.Name = ""
+                                item.IsInvalid = true;
+                              }
+                            }
+                          });
                           
-                          //change its properties
-                          invoiceItem.Id = selected[0].Id;
-                          invoiceItem.Name = selected[0].Name;
-
-                          const filteredItems = invoice.InvoiceItems.filter(x => x.Id !== i.Id);
-
                           return setInvoice({
                             ...invoice,
-                            InvoiceItems:[
-                              ...filteredItems, //filter out editing element
-                              invoiceItem //pushing just edited element
-                            ]
+                            InvoiceItems: items 
                           })
                         }}
                         options={invoiceItems}
@@ -143,18 +169,18 @@ const NewInvoice = () => {
                         id={`invoice-item-quantity-id-${i.Id}`}
                         value={i.Quantity} 
                         onChange={(e) => {
-                          //find invoice item to edit;
-                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id === i.Id)[0];
-                          
-                          //change its properties
-                          invoiceItem.Quantity = e.target.value;
+                          const items = [...invoice.InvoiceItems];
 
+                          items.forEach(item => {
+                            if(item.Id === i.Id){
+                              //change its properties
+                              item.Quantity = e.target.value;
+                            }
+                          });
+                          
                           return setInvoice({
                             ...invoice,
-                            InvoiceItems:[
-                              ...invoice.InvoiceItems.filter(x => x.Id !== i.Id), //filter out editing element
-                              invoiceItem //pushing just edited element
-                            ]
+                            InvoiceItems: items
                           })
                         }}
                       />
@@ -168,35 +194,75 @@ const NewInvoice = () => {
                         id={`invoice-item-price-id-${i.Id}`}
                         value={i.Price} 
                         onChange={(e) => {
-                          //find invoice item to edit;
-                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id === i.Id)[0];
-                          
-                          //change its properties
-                          invoiceItem.Price = e.target.value;
+                          const items = [...invoice.InvoiceItems];
 
+                          items.forEach(item => {
+                            if(item.Id === i.Id){
+                              //change its properties
+                              item.Price = e.target.value;
+                            }
+                          });
+                          
                           return setInvoice({
                             ...invoice,
-                            InvoiceItems:[
-                              ...invoice.InvoiceItems.filter(x => x.Id !== i.Id), //filter out editing element
-                              invoiceItem //pushing just edited element
-                            ]
+                            InvoiceItems: items
                           })
                         }}
                       />
                     </div>
                   </td>
-                  <td>
+                  <td className="align-middle">
                     {`$${i.Quantity * i.Price}`}
                   </td>
-                  <td></td>
+                  <td className="align-middle">
+                    <button 
+                      title="Remove"
+                      className="btn btn-outline-primary btn-sm" 
+                      disabled={invoice.InvoiceItems.length === 1 ? true : false} 
+                      onClick={() => setInvoice({
+                        ...invoice,
+                        InvoiceItems: invoice.InvoiceItems.filter(x => x.Id !== i.Id)
+                    })}>
+                      <i className="bi bi-x-lg"></i>
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-
-          <button className="btn btn-primary" onClick={() => console.log(invoice)}>Print</button>
-
-        </div>{/* end of card-body */}
+        </div>{/* end of card-body */}        
+      </div>
+      <div className="row mt-4">
+        <div className="col text-end">
+          {invoice.IsSaving ? (
+            <button className="btn btn-primary">
+              <div className="spinner-border spinner-border-sm text-light" role="status">
+                <span className="visually-hidden">Saving</span>              
+              </div>&nbsp;
+              Saving...
+            </button>
+          ) : (
+            <button className="btn btn-primary" onClick={async () => {
+              setInvoice({...invoice, IsSaving: true});
+  
+              const savedInvoices = localStorage.getItem("invoices");
+              if(savedInvoices == null){
+                localStorage.setItem("invoices", JSON.stringify([invoice]))
+              }else{
+                const invoices = JSON.parse(savedInvoices);
+                localStorage.setItem("invoices", JSON.stringify([
+                  ...invoices,
+                  invoice
+                ]))
+              }
+  
+              await setTimeout(() => setInvoice({...invoice, IsSaving: false}), 2000)
+            }}>
+              <i className="bi bi-save"></i>&nbsp;
+              Save
+            </button>
+          )}          
+        </div>
       </div>
     </>
   );

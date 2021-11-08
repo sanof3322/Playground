@@ -1,5 +1,4 @@
-import invoiceItems from "../data/invoice-items"
-import { useParams, useNavigate } from "react-router-dom";
+// import { useParams, useNavigate } from "react-router-dom";
 
 const Invoices = () => {
   return (
