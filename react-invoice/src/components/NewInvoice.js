@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const NewInvoice = () => {
   let navigate = useNavigate(); 
 
-  let blankInvoiceItem = {
+  const blankInvoiceItem = {
     Id: 0,
     Name: "",
     Price:  0,
@@ -18,14 +18,12 @@ const NewInvoice = () => {
     ItemTotal: 0
   }
 
-  let invoiceInit = {
+  const  [invoice, setInvoice] = useState({
     InvoiceNumber: "",
     DueDate: "",
     Customer: null,
     InvoiceItems: [blankInvoiceItem]
-  };
-
-  const  [invoice, setInvoice] = useState(invoiceInit)
+  })
 
   return (
     <>
@@ -115,13 +113,13 @@ const NewInvoice = () => {
                         labelKey={option => `${option.Name}`}
                         onChange={(selected) => {
                           //find invoice item to edit;
-                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id == i.Id)[0];
+                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id === i.Id)[0];
                           
                           //change its properties
                           invoiceItem.Id = selected[0].Id;
                           invoiceItem.Name = selected[0].Name;
 
-                          const filteredItems = invoice.InvoiceItems.filter(x => x.Id != i.Id);
+                          const filteredItems = invoice.InvoiceItems.filter(x => x.Id !== i.Id);
 
                           return setInvoice({
                             ...invoice,
@@ -146,7 +144,7 @@ const NewInvoice = () => {
                         value={i.Quantity} 
                         onChange={(e) => {
                           //find invoice item to edit;
-                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id == i.Id)[0];
+                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id === i.Id)[0];
                           
                           //change its properties
                           invoiceItem.Quantity = e.target.value;
@@ -154,7 +152,7 @@ const NewInvoice = () => {
                           return setInvoice({
                             ...invoice,
                             InvoiceItems:[
-                              ...invoice.InvoiceItems.filter(x => x.Id != i.Id), //filter out editing element
+                              ...invoice.InvoiceItems.filter(x => x.Id !== i.Id), //filter out editing element
                               invoiceItem //pushing just edited element
                             ]
                           })
@@ -171,7 +169,7 @@ const NewInvoice = () => {
                         value={i.Price} 
                         onChange={(e) => {
                           //find invoice item to edit;
-                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id == i.Id)[0];
+                          let invoiceItem =  invoice.InvoiceItems.filter(x => x.Id === i.Id)[0];
                           
                           //change its properties
                           invoiceItem.Price = e.target.value;
@@ -179,7 +177,7 @@ const NewInvoice = () => {
                           return setInvoice({
                             ...invoice,
                             InvoiceItems:[
-                              ...invoice.InvoiceItems.filter(x => x.Id != i.Id), //filter out editing element
+                              ...invoice.InvoiceItems.filter(x => x.Id !== i.Id), //filter out editing element
                               invoiceItem //pushing just edited element
                             ]
                           })
