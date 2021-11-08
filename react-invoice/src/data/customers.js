@@ -120,16 +120,16 @@ const customers = [
     }
 ]
 
-let str = ""
-for (let index = 0; index < 20; index++) {
-    str += /*html*/`
-    {
-        Id: ${index + 1},
-        FirstName: "First ${index + 1}",
-        LastName:  "Last ${index + 1}"
-    },
-    `;
-}
-console.log(str);
+// let str = ""
+// for (let index = 0; index < 20; index++) {
+//     str += /*html*/`
+//     {
+//         Id: ${index + 1},
+//         FirstName: "First ${index + 1}",
+//         LastName:  "Last ${index + 1}"
+//     },
+//     `;
+// }
+// console.log(str);
 
 export {customers as default}
