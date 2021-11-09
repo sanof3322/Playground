@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useState, useEffect} from "react"
 import { useNavigate } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import {Typeahead} from 'react-bootstrap-typeahead'
@@ -22,14 +22,55 @@ const NewInvoice = () => {
       Quantity: 1,
       ItemTotal: 0
     }
-  }
+  }  
 
-  const  [invoice, setInvoice] = useState({
-    InvoiceNumber: "",
-    DueDate: "",
-    Customer: null,
-    InvoiceItems: [blankInvoiceItem()]
-  })
+const  [invoice, setInvoice] = useState({
+  InvoiceNumber: "",
+  DueDate: "",
+  Customer: null,
+  SubTotal: 0.00,
+  Shipping: 0.00,
+  Discount: 0.00,
+  Adjustment: 0.00,
+  Tax: 0.00,
+  Total: 0.00,
+  InvoiceItems: [blankInvoiceItem()]
+})
+
+const calcTotal = () => {
+  let SubTotal = 0, Total = 0;
+  
+  invoice.InvoiceItems.forEach(i => {
+    SubTotal += i.Price * i.Quantity
+  });
+  
+  try{
+    Total = SubTotal + ((SubTotal / 100) * invoice.Tax) 
+      + parseFloat(invoice.Shipping) 
+      - parseFloat( invoice.Discount) 
+      + parseFloat(invoice.Adjustment);
+    Total = Total.toFixed(2);
+    SubTotal = SubTotal.toFixed(2)
+
+    
+
+    if(!isNaN(Total)){
+      setInvoice({
+        ...invoice,
+        SubTotal,
+        Total
+      })
+    }
+  }catch(ex){
+    //do nothing
+  }
+};
+ 
+useEffect(() => {
+  calcTotal();  
+}, [invoice.InvoiceItems, invoice.Discount, invoice.Shipping, invoice.Adjustment, invoice.Tax])// eslint-disable-line react-hooks/exhaustive-deps
+
+  
 
   return (
     <>
@@ -229,6 +270,88 @@ const NewInvoice = () => {
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr>
+                <th colSpan="3" className="text-end">
+                    Sub Total:
+                </th>
+                <td colSpan="2" >
+                  {`$${invoice.SubTotal}`}
+                </td>
+              </tr>
+              <tr>
+                <th colSpan="3" className="text-end">
+                    Tax (%):
+                </th>
+                <td colSpan="2" >
+                  <div className="form-group">
+                    <label className="visually-hidden">Tax</label>
+                    <input type="text" 
+                      className="form-control"
+                      value={invoice.Tax} onChange={(e) => setInvoice({
+                      ...invoice,
+                      Tax: e.target.value
+                    })} />                    
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th colSpan="3" className="text-end">
+                    Discount ($):
+                </th>
+                <td colSpan="2" >
+                  <div className="form-group">
+                    <label className="visually-hidden">Discount in $</label>
+                    <input type="text" 
+                      className="form-control"
+                      value={invoice.Discount} onChange={(e) => setInvoice({
+                      ...invoice,
+                      Discount: e.target.value
+                    })} />                    
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th colSpan="3" className="text-end">
+                    Shipping ($):
+                </th>
+                <td colSpan="2" >
+                  <div className="form-group">
+                    <label className="visually-hidden">Shipping</label>
+                    <input type="text" 
+                      className="form-control"
+                      value={invoice.Shipping} onChange={(e) => setInvoice({
+                      ...invoice,
+                      Shipping: e.target.value
+                    })} />                    
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th colSpan="3" className="text-end">
+                    Adjustment (+/-):
+                </th>
+                <td colSpan="2" >
+                  <div className="form-group">
+                    <label className="visually-hidden">Adjustment</label>
+                    <input type="text" 
+                      className="form-control"
+                      value={invoice.Adjustment} onChange={(e) => setInvoice({
+                      ...invoice,
+                      Adjustment: e.target.value
+                    })} />                    
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th colSpan="3" className="text-end">
+                    Total:
+                </th>
+                <td colSpan="2" >
+                  {`$${invoice.Total}`}
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>{/* end of card-body */}        
       </div>
